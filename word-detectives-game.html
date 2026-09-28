@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Unit 2 Vocab Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #faf8f5; --paper-line: #111111; --card: #faf8f5;
+    --ink: #111111; --ink-soft: #555555;
+    --navy: #111111; --brass: #ff6fa0; --brass-dark: #d6427a;
+    --green: #3fb950; --red: #e63946;
+    --shadow: rgba(0,0,0,0.2);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #141414; --paper-line: #f4f4f4; --card: #1e1e1e;
+      --ink: #f4f4f4; --ink-soft: #b8b8b8;
+      --navy: #f4f4f4; --brass: #ff8fb5; --brass-dark: #ffb3cf;
+      --green: #6fd97f; --red: #ff7b85;
+      --shadow: rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #141414; --paper-line: #f4f4f4; --card: #1e1e1e;
+    --ink: #f4f4f4; --ink-soft: #b8b8b8;
+    --navy: #f4f4f4; --brass: #ff8fb5; --brass-dark: #ffb3cf;
+    --green: #6fd97f; --red: #ff7b85;
+    --shadow: rgba(0,0,0,0.6);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background-color: #e8dff5;
+    color: var(--ink); font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 17px; line-height: 1.5; min-height: 100vh;
+    display: flex; justify-content: center;
+    padding: calc(2rem + env(safe-area-inset-top,0px)) 1rem calc(2.8rem + env(safe-area-inset-bottom,0px));
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) { background-color: #2a2338; }
+  }
+  .wrap {
+    width: 100%; max-width: 620px; position: relative;
+    background: var(--card); border: 4px solid #000; border-radius: 18px;
+    padding: 1.6rem 1.4rem 1.8rem; box-shadow: 0 10px 26px var(--shadow);
+  }
+  .sticker-star {
+    position: absolute; top: -16px; left: -16px; width: 42px; height: 42px; z-index: 5;
+    background: var(--brass);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3)); transform: rotate(-12deg);
+  }
+  .sticker-smiley {
+    position: absolute; bottom: -14px; right: -12px; font-size: 2.4rem; z-index: 5;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+  }
+  header { text-align: center; margin-bottom: 1rem; }
+  h1 { font-family: 'Baloo 2', cursive; font-weight: 400; font-size: 1.6rem; margin: 0 0 0.2rem; color: var(--navy); }
+  .subtitle { color: var(--ink-soft); font-size: 0.95rem; }
+  .scorebar { display: flex; justify-content: space-between; align-items: center; margin: 0.8rem 0 1.1rem; font-size: 0.9rem; color: var(--ink-soft); }
+  .progress-dots { display: flex; gap: 0.3rem; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--brass); background: transparent; }
+  .dot.done { background: var(--brass); }
+  .card {
+    background: var(--card); border: 2px solid #000;
+    border-radius: 10px;
+    padding: 1.5rem 1.4rem; min-height: 420px; display: flex; flex-direction: column;
+  }
+  .case-label { font-family: 'Baloo 2', cursive; color: var(--brass-dark); font-size: 0.85rem; margin-bottom: 0.3rem; }
+  .target-word { font-family: 'Baloo 2', cursive; font-size: 1.5rem; color: var(--navy); margin: 0 0 1rem; }
+  .blanks { display: flex; flex-wrap: wrap; gap: 0.5rem; min-height: 3.2rem; margin-bottom: 1.2rem; }
+  .blank-slot {
+    min-width: 3.2rem; height: 2.6rem; border: 2px dashed var(--paper-line); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; padding: 0 0.5rem;
+    font-weight: 700; color: var(--ink); background: rgba(0,0,0,0.02);
+  }
+  .blank-slot.filled { border-style: solid; border-color: var(--green); background: rgba(63,185,80,0.12); }
+  .pool-label { font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 0.4rem; }
+  .pool { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+  .tile {
+    font-family: 'Baloo 2', cursive; font-size: 0.95rem;
+    background: var(--navy); color: #ffffff; border: none; border-radius: 6px;
+    padding: 0.5rem 0.8rem; cursor: pointer; transition: transform 0.15s, opacity 0.15s;
+  }
+  .tile:hover { transform: translateY(-2px); }
+  .tile:disabled { opacity: 0.35; cursor: not-allowed; }
+  .tile.shake { animation: shake 0.3s; background: var(--red); }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
+  .feedback { min-height: 1.4rem; font-size: 0.9rem; color: var(--red); margin-bottom: 0.6rem; }
+  .hint-box { display: none; background: rgba(0,0,0,0.1); border-left: 3px solid var(--navy); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 0.8rem; font-size: 0.9rem; color: var(--navy); }
+  .hint-box.show { display: block; }
+  .fail-card { text-align: center; }
+  .fail-card .headline { font-family: 'Baloo 2', cursive; font-size: 1.6rem; color: var(--red); margin: 0.5rem 0 0.8rem; }
+  .fail-card .word { font-family: 'Baloo 2', cursive; font-size: 1.3rem; color: var(--navy); margin-bottom: 0.6rem; }
+  .reveal { display: none; background: rgba(255,111,160,0.12); border-left: 3px solid var(--brass); border-radius: 6px; padding: 0.9rem 1rem; margin-top: auto; }
+  .reveal.show { display: block; }
+  .reveal .def { font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
+  .reveal .trivia { font-size: 0.9rem; color: var(--ink-soft); }
+  .next-btn {
+    margin-top: 0.9rem; align-self: flex-end; font-family: 'Nunito', sans-serif; font-weight: 700;
+    background: var(--green); color: white; border: none; border-radius: 6px; padding: 0.6rem 1.2rem; cursor: pointer;
+  }
+  .next-btn:disabled { opacity: 0; pointer-events: none; }
+  .bonus-card { text-align: center; }
+  .bonus-card .word { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: var(--navy); margin: 0.5rem 0; }
+  .final-score { font-family: 'Baloo 2', cursive; font-size: 2.4rem; color: var(--brass-dark); text-align: center; margin: 1rem 0; }
+  .review-card {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; cursor: pointer; user-select: none; border-radius: 8px;
+    border: 2px solid var(--paper-line); background: rgba(0,0,0,0.02); padding: 1.5rem;
+  }
+  .review-morpheme { font-family: 'Baloo 2', cursive; font-size: 2.2rem; color: var(--navy); margin-bottom: 0.5rem; }
+  .review-meaning { font-size: 1.3rem; font-weight: 700; color: var(--green); margin-bottom: 0.3rem; }
+  .review-origin { font-size: 0.95rem; color: var(--ink-soft); }
+  .review-hint { font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.8rem; font-style: italic; }
+  .review-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+  .review-counter { font-size: 0.85rem; color: var(--ink-soft); }
+  .nav-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 700; background: var(--navy); color: #ffffff;
+    border: none; border-radius: 6px; padding: 0.5rem 0.9rem; cursor: pointer;
+  }
+  .start-cases-btn {
+    margin-top: 1rem; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+    background: var(--green); color: white; border: none; border-radius: 8px;
+    padding: 0.8rem 1.2rem; cursor: pointer; width: 100%;
+  }
+  @media (max-width: 480px) {
+    body { font-size: 16px; }
+    .card { padding: 1.2rem 1rem; min-height: 440px; }
+  }
+
+  /* Start screen */
+  .mode-select { display: flex; flex-direction: column; gap: 0.9rem; justify-content: center; flex: 1; }
+  .mode-btn {
+    font-family: 'Nunito', sans-serif; text-align: left; background: var(--card);
+    border: 2px solid var(--paper-line); border-radius: 10px; padding: 1.1rem 1.2rem;
+    cursor: pointer; transition: transform 0.15s, border-color 0.15s;
+  }
+  .mode-btn:hover { transform: translateY(-2px); border-color: var(--brass); }
+  .mode-btn .title { font-family: 'Baloo 2', cursive; font-size: 1.2rem; color: var(--navy); margin-bottom: 0.25rem; }
+  .mode-btn .desc { font-size: 0.9rem; color: var(--ink-soft); }
+  .mode-btn-locked { opacity: 0.5; cursor: not-allowed; background: rgba(0,0,0,0.04); }
+  .mode-btn-locked:hover { transform: none; border-color: var(--paper-line); }
+  .menu-link {
+    background: none; border: none; color: var(--ink-soft); font-size: 0.85rem;
+    text-decoration: underline; cursor: pointer; padding: 0; font-family: 'Nunito', sans-serif;
+  }
+  .menu-link[hidden] { display: none; }
+
+  /* Bingo */
+  .caller-box { background: rgba(0,0,0,0.08); border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 0.8rem; text-align: center; }
+  .caller-current { font-family: 'Baloo 2', cursive; font-size: 1.5rem; color: var(--navy); }
+  .caller-sub { font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.2rem; }
+  .called-list { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.9rem; }
+  .called-chip { font-size: 0.75rem; background: var(--paper-line); border-radius: 999px; padding: 0.15rem 0.55rem; color: var(--ink); }
+  .bingo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin-bottom: 1rem; }
+  .bingo-cell {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center; text-align: center;
+    font-size: 0.7rem; line-height: 1.1; padding: 0.3rem; border: 2px solid var(--paper-line);
+    border-radius: 6px; cursor: pointer; background: rgba(0,0,0,0.02); transition: background 0.15s, transform 0.1s;
+  }
+  .bingo-cell:hover { transform: scale(1.03); }
+  .bingo-cell.marked { background: var(--green); color: white; border-color: var(--green); }
+  .bingo-cell.free { background: var(--brass); color: white; border-color: var(--brass); cursor: default; font-weight: 800; font-size: 0.85rem; }
+  .bingo-cell.shake { animation: shake 0.3s; border-color: var(--red); }
+  .bingo-cell.hint { outline: 3px solid var(--brass); animation: pulse 1s infinite alternate; }
+  @keyframes pulse { from { box-shadow: 0 0 0 rgba(255,111,160,0.4); } to { box-shadow: 0 0 10px rgba(255,111,160,0.7); } }
+  .bingo-hint-text { font-size: 0.85rem; color: var(--navy); background: rgba(0,0,0,0.08); border-left: 3px solid var(--navy); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 0.8rem; }
+  .call-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; background: var(--navy); color: #ffffff;
+    border: none; border-radius: 8px; padding: 0.7rem 1rem; cursor: pointer; width: 100%; margin-bottom: 0.6rem;
+  }
+  .call-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .win-banner { text-align: center; padding: 1.5rem 1rem; }
+  .win-banner .headline { font-family: 'Baloo 2', cursive; font-size: 2rem; color: var(--brass-dark); margin-bottom: 0.6rem; }
+
+  /* Money / Monopoly */
+  .money-display {
+    margin-top: 0.5rem; font-family: 'Baloo 2', cursive; font-size: 1.1rem;
+    color: var(--brass-dark); background: rgba(255,111,160,0.12); display: inline-block;
+    padding: 0.35rem 1rem; border-radius: 999px; border: 1px solid var(--brass);
+  }
+  .monopoly-crown { margin-left: 0.4rem; }
+  .monopoly-toast {
+    position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+    background: var(--brass); color: white; padding: 0.9rem 1.5rem; border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35); font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem; z-index: 1000; text-align: center; max-width: 90vw;
+    animation: toastIn 0.4s ease, toastOut 0.4s ease 4.2s forwards;
+  }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+  @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+  /* Vocab games shared */
+  .quiz-sentence { font-size: 1.05rem; margin-bottom: 1.1rem; }
+  .quiz-blank { font-weight: 800; color: var(--brass-dark); border-bottom: 2px solid var(--brass-dark); padding: 0 0.3rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem; }
+  .opt-btn {
+    font-family: 'Nunito', sans-serif; font-size: 0.98rem; text-align: left; background: var(--card);
+    border: 2px solid var(--paper-line); border-radius: 8px; padding: 0.7rem 0.9rem; cursor: pointer;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--brass); }
+  .opt-btn.correct { background: rgba(63,185,80,0.18); border-color: var(--green); }
+  .opt-btn.wrong { background: rgba(230,57,70,0.18); border-color: var(--red); }
+  .opt-btn:disabled { cursor: default; }
+  .quiz-progress { font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 0.6rem; }
+  .timer-badge { font-family: 'Baloo 2', cursive; font-size: 1.2rem; color: var(--red); text-align: center; margin-bottom: 0.6rem; }
+  .match-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin-bottom: 0.8rem; }
+  .match-card {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center; text-align: center;
+    font-size: 0.65rem; line-height: 1.05; padding: 0.25rem; border-radius: 6px; cursor: pointer;
+    background: var(--navy); color: #ffffff; font-size: 1.1rem; transition: background 0.2s, color 0.2s;
+  }
+  .match-card.flipped, .match-card.matched { background: var(--card); color: var(--ink); border: 2px solid var(--paper-line); font-size: 0.65rem; }
+  .match-card.matched { background: rgba(63,185,80,0.18); border-color: var(--green); cursor: default; }
+  .match-status { font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 0.6rem; text-align: center; }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sticker-star"></div>
+  <div class="sticker-smiley">😊</div>
+  <header>
+    <h1 id="main-title">Unit 2 Vocab Games</h1>
+    <div class="subtitle" id="main-subtitle">Choose a game mode to begin</div>
+    <div class="money-display" id="money-display">💰 Capital: $0</div>
+  </header>
+  <div class="scorebar">
+    <span id="score-label">Score: 0</span>
+    <button class="menu-link" id="menu-btn" hidden onclick="goToStart()">&lsaquo; Back to menu</button>
+    <div class="progress-dots" id="dots"></div>
+  </div>
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+const WORDS = [
+  { word: "industrialization", pieces: ["industri-", "-al", "-ize", "-ation"],
+    def: "The widespread development of industries in a region or culture.",
+    trivia: "industri- comes from Latin industria (\"busy activity\"). -al isn't on your morpheme chart, but it's a common piece meaning \"relating to.\"" },
+  { word: "interchangeable", pieces: ["inter-", "change", "-able"],
+    def: "Capable of being swapped or substituted for each other without losing function, value, or meaning.",
+    trivia: "\"change\" isn't a Latin/Greek morpheme like the others \u2014 it's just a regular English root." },
+  { word: "textile", pieces: ["text-", "-ile"],
+    def: "A woven or knit cloth.",
+    trivia: "text- comes from Latin texere, \"to weave\" \u2014 same root as \"text,\" since weaving words together is a lot like weaving cloth!" },
+  { word: "production", pieces: ["pro-", "duc/duct", "-tion"],
+    def: "Making large amounts of standardized goods quickly and cheaply using machinery (as in mass production).",
+    trivia: "duc/duct (\"to lead\") shows up in lots of words \u2014 conduct, introduce, reduce \u2014 all about \"leading\" something somewhere." },
+  { word: "agriculture", pieces: ["agri-", "culture"],
+    def: "The practice of growing crops and raising livestock for food and other products.",
+    trivia: "Literally \"the cultivation of fields\" \u2014 agri- (field) + culture (cultivation), both from Latin." },
+  { word: "manufacture", pieces: ["manu-", "facture"],
+    def: "To make goods or products on a large scale using machines.",
+    trivia: "Literally \"made by hand\" \u2014 a little ironic, since factories exist to do the opposite of handmade!" }
+];
+
+const BONUS = [
+  { word: "unions", fact: "From Latin uni- (\"one\") \u2014 a union brings many workers together as one voice. The \"-s\" is just the plural, and \"-on\" doesn't carry a separate meaning here." },
+  { word: "strikes", fact: "\"Strike\" doesn't break down into Latin or Greek pieces at all \u2014 it's a single Old English root (strican, \"to rub or stroke\") that later came to mean stopping work." }
+];
+
+const MEANINGS = {
+  "industri-": "busy activity", "-al": "relating to", "-ize": "to make", "-ation": "process",
+  "inter-": "between", "change": "to change", "-able": "capable of being",
+  "text-": "to weave", "-ile": "pertaining to",
+  "pro-": "forward", "duc/duct": "to lead", "-tion": "process of",
+  "agri-": "field", "culture": "cultivation",
+  "manu-": "hand", "facture": "to make"
+};
+
+const REVIEW_CARDS = [
+  { morpheme: "industri-", meaning: "busy activity", origin: "Latin" },
+  { morpheme: "inter-", meaning: "between", origin: "Latin" },
+  { morpheme: "-ize", meaning: "to make", origin: "Greek" },
+  { morpheme: "-ation", meaning: "process", origin: "Latin" },
+  { morpheme: "-able", meaning: "capable of being", origin: "Latin" },
+  { morpheme: "text-", meaning: "to weave", origin: "Latin" },
+  { morpheme: "-ile", meaning: "pertaining to", origin: "Latin" },
+  { morpheme: "pro-", meaning: "forward", origin: "Latin" },
+  { morpheme: "duc / duct", meaning: "to lead", origin: "Latin" },
+  { morpheme: "-tion", meaning: "process of", origin: "Latin" },
+  { morpheme: "agri-", meaning: "field", origin: "Latin" },
+  { morpheme: "culture", meaning: "cultivation", origin: "Latin" },
+  { morpheme: "manu-", meaning: "hand", origin: "Latin" },
+  { morpheme: "facture", meaning: "to make", origin: "Latin" },
+  { morpheme: "uni-", meaning: "one", origin: "Latin" }
+];
+
+// Build 12 cases: spelling mode then meaning mode, back to back, for each word
+const CASES = WORDS.flatMap(w => [
+  { ...w, mode: "piece" },
+  { ...w, mode: "meaning" }
+]);
+
+const ALL_PIECES = [...new Set(WORDS.flatMap(w => w.pieces))];
+
+let appMode = "start"; // "start" | "detective" | "bingo"
+let detectiveCompleted = false;
+
+// ---------- Persistent Capital / Monopoly ----------
+let totalMoney = 0;
+let monopolyAchieved = false;
+const MONOPOLY_THRESHOLD = 500;
+
+function earnMoney(amount) {
+  totalMoney += amount;
+  updateMoneyDisplay();
+  if (!monopolyAchieved && totalMoney >= MONOPOLY_THRESHOLD) {
+    monopolyAchieved = true;
+    showMonopolyToast();
+    updateMoneyDisplay();
+  }
+}
+
+function updateMoneyDisplay() {
+  const el = document.getElementById('money-display');
+  el.innerHTML = `\ud83d\udcb0 Capital: $${totalMoney}` + (monopolyAchieved ? `<span class="monopoly-crown">\ud83d\udc51 MONOPOLY</span>` : '');
+}
+
+function showMonopolyToast() {
+  const toast = document.createElement('div');
+  toast.className = 'monopoly-toast';
+  toast.innerHTML = `\ud83c\udfed <strong>MONOPOLY ACHIEVED!</strong><br>You've cornered the market on Unit 2 vocabulary.`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 4600);
+}
+
+let gameState = "review"; // "review" | "cases" | "bonus" | "final"
+let reviewIdx = 0;
+let reviewFlipped = false;
+
+let idx = 0;
+let score = 0;
+let placed = [];
+let currentPool = [];
+let wrongCount = 0;
+let hintShown = false;
+
+const PENALTY_PER_WRONG = 5;
+const HINT_AFTER_WRONG = 3;
+const FAIL_AFTER_WRONG = 6;
+
+// ---------- Bingo state ----------
+let bingoCells = [];   // 16 cells: {morpheme, meaning, free}
+let bingoMarked = [];  // 16 booleans
+let bingoCallQueue = [];
+let bingoCalled = [];  // morphemes called so far, in order
+let bingoWon = false;
+let bingoWrongCount = 0;
+let bingoHintCellIndex = null;
+
+const BINGO_HINT_AFTER_WRONG = 3;
+
+let speedTimerId = null;
+let msTimerId = null;
+
+const VOCAB = [
+  { word: "industrialization", def: "The widespread development of industries in a region or culture.",
+    sentence: "My grandmother scoffed at the increase of ___." },
+  { word: "interchangeable", def: "Capable of being swapped or substituted for each other without losing function, value, or meaning.",
+    sentence: "Although both terms sound similar, the two words are not ___." },
+  { word: "unions", def: "Groups of workers who got together to demand better working conditions.",
+    sentence: "The Textile Mill's employees formed a ___." },
+  { word: "strikes", def: "A group of employees who refuse to work in order to protest poor conditions.",
+    sentence: "The employees went on ___ to protest having to work on Christmas." },
+  { word: "textile", def: "A woven or knit cloth.",
+    sentence: "The designer worked with fun ___ such as printed fabric." },
+  { word: "mass production", def: "Making large amounts of standardized goods quickly and cheaply using machinery.",
+    sentence: "The company lowered prices after implementing ___." },
+  { word: "manufacture", def: "To make goods or products on a large scale using machines.",
+    sentence: "Tyson ___ chicken products." },
+  { word: "agriculture", def: "The practice of growing crops and raising livestock for food and other products.",
+    sentence: "You may study hay, cows, or pigs to better understand ___." }
+];
+
+const TRUTH_LIE = [
+  { word: "industrialization", explanation: "Deindustrialization is the antonym \u2014 the opposite of industrialization, not another way of saying it.", statements: [
+    { text: "It means the widespread development of industries in a region or culture.", isLie: false },
+    { text: "A synonym for it is modernization.", isLie: false },
+    { text: "Its antonym, deindustrialization, means the same thing as industrialization.", isLie: true } ] },
+  { word: "interchangeable", explanation: "Something \"unique and irreplaceable\" is the opposite of interchangeable \u2014 that's its antonym, not its meaning.", statements: [
+    { text: "It means capable of being swapped or substituted for each other without losing function, value, or meaning.", isLie: false },
+    { text: "A synonym for it is substitutable.", isLie: false },
+    { text: "It means something that is completely unique and cannot be replaced.", isLie: true } ] },
+  { word: "unions", explanation: "Working alone without group support is the OPPOSITE of a union \u2014 that's the antonym, \"individuals.\"", statements: [
+    { text: "It means groups of workers who got together to demand better working conditions.", isLie: false },
+    { text: "A synonym for it is organizations.", isLie: false },
+    { text: "It means individuals working alone without any group support.", isLie: true } ] },
+  { word: "strikes", explanation: "Fully complying with an employer is the opposite of a strike \u2014 that's the antonym, \"compliance.\"", statements: [
+    { text: "It means a group of employees who refuse to work in order to protest poor conditions.", isLie: false },
+    { text: "A synonym for it is protest.", isLie: false },
+    { text: "It means employees fully complying with all of their employer's demands.", isLie: true } ] },
+  { word: "textile", explanation: "A textile is cloth, not a machine \u2014 don't mix up the fabric with the factory equipment that makes it.", statements: [
+    { text: "It means a woven or knit cloth.", isLie: false },
+    { text: "A synonym for it is cloth.", isLie: false },
+    { text: "It refers to a type of machine used to assemble metal parts.", isLie: true } ] },
+  { word: "mass production", explanation: "Making one custom item by hand is the antonym of mass production \u2014 the opposite of making many standardized goods by machine.", statements: [
+    { text: "It means making large amounts of standardized goods quickly and cheaply using machinery.", isLie: false },
+    { text: "A synonym for it is volume production.", isLie: false },
+    { text: "It means making one custom item at a time by hand.", isLie: true } ] },
+  { word: "manufacture", explanation: "To destroy or ruin something is the antonym of manufacture \u2014 the opposite of making or producing it.", statements: [
+    { text: "It means to make goods or products on a large scale using machines.", isLie: false },
+    { text: "A synonym for it is produce.", isLie: false },
+    { text: "It means to destroy or ruin something.", isLie: true } ] },
+  { word: "agriculture", explanation: "Manufacturing is the antonym listed for agriculture \u2014 farming fields is not the same as making goods in a factory.", statements: [
+    { text: "It's the practice of growing crops and raising livestock for food and other products.", isLie: false },
+    { text: "A synonym for it is farming.", isLie: false },
+    { text: "It means the same thing as manufacturing.", isLie: true } ] }
+];
+
+function goToStart() {
+  appMode = "start";
+  if (speedTimerId) { clearInterval(speedTimerId); speedTimerId = null; }
+  if (msTimerId) { clearInterval(msTimerId); msTimerId = null; }
+  document.getElementById('main-title').textContent = "Unit 2 Vocab Games";
+  document.getElementById('main-subtitle').textContent = "Choose a game mode to begin";
+  document.getElementById('menu-btn').hidden = true;
+  document.getElementById('score-label').textContent = "";
+  document.getElementById('dots').innerHTML = '';
+  renderStart();
+}
+
+function renderStart() {
+  const card = document.getElementById('card');
+  const locked = !detectiveCompleted;
+  card.innerHTML = `
+    <div class="mode-select">
+      <button class="mode-btn" id="pick-detective">
+        <div class="title">🔍 Word Detective</div>
+        <div class="desc">Build vocabulary words piece by piece from their morphemes \u2014 by spelling AND by meaning. Start here!</div>
+      </button>
+      <button class="mode-btn${locked ? ' mode-btn-locked' : ''}" id="pick-bingo" ${locked ? 'disabled' : ''}>
+        <div class="title">${locked ? '\ud83d\udd12' : '\ud83c\udfb1'} Morpheme Games</div>
+        <div class="desc">${locked ? 'Finish Word Detective to unlock this game.' : "Three quick ways to drill morpheme meanings: Bingo, Memory Match, and a timed Speed Round."}</div>
+      </button>
+      <button class="mode-btn${locked ? ' mode-btn-locked' : ''}" id="pick-vocab" ${locked ? 'disabled' : ''}>
+        <div class="title">${locked ? '\ud83d\udd12' : '\ud83d\udcd8'} Vocab Word Games</div>
+        <div class="desc">${locked ? 'Finish Word Detective to unlock this game.' : "Four quick ways to practice the whole vocabulary words themselves \u2014 not just their parts."}</div>
+      </button>
+    </div>
+  `;
+  document.getElementById('pick-detective').onclick = startDetective;
+  if (!locked) {
+    document.getElementById('pick-bingo').onclick = startMorphemeMenu;
+    document.getElementById('pick-vocab').onclick = startVocabMenu;
+  }
+}
+
+function startDetective() {
+  appMode = "detective";
+  document.getElementById('main-title').textContent = "🔍 Word Detectives";
+  document.getElementById('main-subtitle').textContent = "Morpheme Match-Up Case File";
+  document.getElementById('menu-btn').hidden = false;
+  gameState = 'review'; reviewIdx = 0; reviewFlipped = false; idx = 0; score = 0;
+  updateScore(); advance();
+}
+
+function startMorphemeMenu() {
+  appMode = "morphememenu";
+  document.getElementById('main-title').textContent = "🎱 Morpheme Games";
+  document.getElementById('main-subtitle').textContent = "Pick a way to practice morpheme meanings";
+  document.getElementById('menu-btn').hidden = false;
+  document.getElementById('dots').innerHTML = '';
+  document.getElementById('score-label').textContent = '';
+  renderMorphemeMenu();
+}
+
+function renderMorphemeMenu() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="mode-select">
+      <button class="mode-btn" id="pick-mbingo">
+        <div class="title">🎱 Morpheme Bingo</div>
+        <div class="desc">Get a randomized card of morpheme meanings. Call morphemes one at a time and mark the matching meaning \u2014 four in a row wins!</div>
+      </button>
+      <button class="mode-btn" id="pick-mmatch">
+        <div class="title">🃏 Morpheme Memory Match</div>
+        <div class="desc">Classic memory match \u2014 flip cards to pair each morpheme with its meaning.</div>
+      </button>
+      <button class="mode-btn" id="pick-mspeed">
+        <div class="title">⚡ Morpheme Speed Round</div>
+        <div class="desc">A meaning appears \u2014 click the matching morpheme before time runs out!</div>
+      </button>
+    </div>
+  `;
+  document.getElementById('pick-mbingo').onclick = startBingo;
+  document.getElementById('pick-mmatch').onclick = startMorphMatch;
+  document.getElementById('pick-mspeed').onclick = startMorphSpeed;
+}
+
+function startBingo() {
+  appMode = "bingo";
+  document.getElementById('main-title').textContent = "🎱 Morpheme Bingo";
+  document.getElementById('main-subtitle').textContent = "Mark meanings as morphemes are called";
+  document.getElementById('menu-btn').hidden = false;
+  document.getElementById('dots').innerHTML = '';
+  initBingoCard();
+  renderBingo();
+}
+
+function renderDots() {
+  const dots = document.getElementById('dots');
+  dots.innerHTML = '';
+  if (gameState === 'review') { dots.innerHTML = ''; return; }
+  const total = CASES.length + BONUS.length;
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < idx ? ' done' : '');
+    dots.appendChild(d);
+  }
+}
+
+function updateScore() {
+  document.getElementById('score-label').textContent = gameState === 'review' ? 'Review Mode' : 'Score: ' + score;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildPool(correctPieces, mode) {
+  const distractorsPool = ALL_PIECES.filter(p => !correctPieces.includes(p));
+  const distractors = shuffle(distractorsPool).slice(0, 3);
+  const all = shuffle([...correctPieces, ...distractors]);
+  return all.map(piece => ({
+    value: piece,
+    label: mode === 'meaning' ? MEANINGS[piece] : piece
+  }));
+}
+
+// ---------- Review Mode ----------
+function renderReview() {
+  const card = document.getElementById('card');
+  const c = REVIEW_CARDS[reviewIdx];
+  card.innerHTML = `
+    <div class="case-label">Morpheme Review \u2014 look these over as many times as you'd like</div>
+    <div class="review-card" id="review-face"></div>
+    <div class="review-nav">
+      <button class="nav-btn" id="prev-btn">\u2190 Prev</button>
+      <span class="review-counter">Card ${reviewIdx + 1} of ${REVIEW_CARDS.length}</span>
+      <button class="nav-btn" id="next-review-btn">Next \u2192</button>
+    </div>
+    <button class="start-cases-btn" id="start-cases-btn">Start the Case Files \u2192</button>
+  `;
+  renderReviewFace();
+  document.getElementById('review-face').onclick = () => { reviewFlipped = !reviewFlipped; renderReviewFace(); };
+  document.getElementById('prev-btn').onclick = () => {
+    reviewIdx = (reviewIdx - 1 + REVIEW_CARDS.length) % REVIEW_CARDS.length;
+    reviewFlipped = false; renderReview();
+  };
+  document.getElementById('next-review-btn').onclick = () => {
+    reviewIdx = (reviewIdx + 1) % REVIEW_CARDS.length;
+    reviewFlipped = false; renderReview();
+  };
+  document.getElementById('start-cases-btn').onclick = () => {
+    gameState = 'cases'; idx = 0; score = 0; updateScore(); advance();
+  };
+}
+
+function renderReviewFace() {
+  const c = REVIEW_CARDS[reviewIdx];
+  const face = document.getElementById('review-face');
+  if (!reviewFlipped) {
+    face.innerHTML = `<div class="review-morpheme">${c.morpheme}</div><div class="review-hint">Tap to reveal meaning &amp; origin</div>`;
+  } else {
+    face.innerHTML = `<div class="review-morpheme">${c.morpheme}</div><div class="review-meaning">${c.meaning}</div><div class="review-origin">${c.origin}</div>`;
+  }
+}
+
+// ---------- Case Mode ----------
+function renderWordCard() {
+  const w = CASES[idx];
+  placed = [];
+  wrongCount = 0;
+  hintShown = false;
+  currentPool = buildPool(w.pieces, w.mode);
+  const card = document.getElementById('card');
+  const instruction = w.mode === 'meaning'
+    ? 'Click the <strong>meanings</strong> in order (this time, no spelling clues!):'
+    : 'Click the pieces in order:';
+  card.innerHTML = `
+    <div class="case-label">Case #${idx + 1} of ${CASES.length} \u2014 ${w.mode === 'meaning' ? 'Meaning Mode' : 'Spelling Mode'}</div>
+    <div class="target-word">Build: ${w.word}</div>
+    <div class="blanks" id="blanks"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="hint-box" id="hint-box"></div>
+    <div class="pool-label">${instruction}</div>
+    <div class="pool" id="pool"></div>
+    <div class="reveal" id="reveal">
+      <div class="def">${w.def}</div>
+      <div class="trivia">${w.trivia}</div>
+    </div>
+    <button class="next-btn" id="next-btn" disabled>Next Case \u2192</button>
+  `;
+  renderBlanks(w.pieces.length);
+  renderPool();
+  document.getElementById('next-btn').onclick = () => { idx++; advance(); };
+}
+
+function renderBlanks(count) {
+  const blanks = document.getElementById('blanks');
+  blanks.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const b = document.createElement('div');
+    b.className = 'blank-slot' + (placed[i] ? ' filled' : '');
+    b.textContent = placed[i] || '?';
+    blanks.appendChild(b);
+  }
+}
+
+function renderPool() {
+  const pool = document.getElementById('pool');
+  pool.innerHTML = '';
+  currentPool.forEach((tile) => {
+    const btn = document.createElement('button');
+    btn.className = 'tile';
+    btn.textContent = tile.label;
+    btn.onclick = () => tryPiece(tile.value, btn);
+    pool.appendChild(btn);
+  });
+}
+
+function tryPiece(piece, btnEl) {
+  const w = CASES[idx];
+  const nextIndex = placed.length;
+  if (w.pieces[nextIndex] === piece) {
+    placed.push(piece);
+    score += 10;
+    updateScore();
+    const removeIdx = currentPool.findIndex(t => t.value === piece);
+    if (removeIdx > -1) currentPool.splice(removeIdx, 1);
+    renderBlanks(w.pieces.length);
+    renderPool();
+    document.getElementById('feedback').textContent = '';
+    if (placed.length === w.pieces.length) {
+      document.getElementById('reveal').classList.add('show');
+      document.getElementById('next-btn').disabled = false;
+      document.querySelectorAll('#pool .tile').forEach(t => t.disabled = true);
+    }
+  } else {
+    wrongCount++;
+    score = Math.max(0, score - PENALTY_PER_WRONG);
+    updateScore();
+    btnEl.classList.add('shake');
+    document.getElementById('feedback').textContent = `Not the next piece \u2014 try again! (\u22125 points)`;
+    setTimeout(() => btnEl.classList.remove('shake'), 300);
+
+    if (wrongCount >= FAIL_AFTER_WRONG) {
+      renderFailCard(w);
+      return;
+    }
+    if (wrongCount >= HINT_AFTER_WRONG) {
+      showHint(w);
+    }
+  }
+}
+
+function showHint(w) {
+  hintShown = true;
+  const nextPiece = w.pieces[placed.length];
+  const hintText = w.mode === 'meaning'
+    ? `Hint: the next piece is spelled \u201C${nextPiece}\u201D`
+    : `Hint: the next piece means \u201C${MEANINGS[nextPiece]}\u201D`;
+  const box = document.getElementById('hint-box');
+  box.textContent = hintText;
+  box.classList.add('show');
+}
+
+function renderFailCard(w) {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="fail-card">
+      <div class="case-label">Case #${idx + 1}</div>
+      <div class="headline">You Didn't Crack the Case!</div>
+      <div class="word">${w.word}</div>
+      <p>Too many wrong guesses on this one. Let's go back and review the morphemes before trying again.</p>
+      <button class="next-btn" id="retry-btn" style="align-self:center;">\u21ba Back to Review</button>
+    </div>
+  `;
+  document.getElementById('retry-btn').onclick = () => {
+    gameState = 'review'; reviewIdx = 0; reviewFlipped = false; updateScore(); renderDots(); renderReview();
+  };
+}
+
+function renderBonusCard() {
+  const b = BONUS[idx - CASES.length];
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="bonus-card">
+      <div class="case-label">Bonus Case \u2014 No Morphemes Here!</div>
+      <div class="word">${b.word}</div>
+      <p>${b.fact}</p>
+      <button class="next-btn" id="next-btn" style="align-self:center;">Continue \u2192</button>
+    </div>
+  `;
+  document.getElementById('next-btn').onclick = () => { idx++; advance(); };
+}
+
+function renderFinal() {
+  detectiveCompleted = true;
+  const card = document.getElementById('card');
+  const maxScore = CASES.reduce((sum, c) => sum + c.pieces.length * 10, 0);
+  card.innerHTML = `
+    <div class="bonus-card">
+      <div class="case-label">Case Closed</div>
+      <div class="final-score">${score} / ${maxScore}</div>
+      <p>You've cracked every case in this word file. Nice detective work \u2014 keep an eye out for these word parts in new vocabulary!</p>
+      <p>Click "Back to menu" to play more vocab games and earn your "Monopoly" status!</p>
+      <button class="next-btn" id="restart-btn" style="align-self:center;">\u21ba Reopen the File</button>
+    </div>
+  `;
+  document.getElementById('restart-btn').onclick = () => {
+    gameState = 'review'; reviewIdx = 0; reviewFlipped = false; idx = 0; score = 0; updateScore(); renderDots(); renderReview();
+  };
+}
+
+function advance() {
+  renderDots();
+  if (gameState === 'review') {
+    renderReview();
+  } else if (idx < CASES.length) {
+    renderWordCard();
+  } else if (idx < CASES.length + BONUS.length) {
+    renderBonusCard();
+  } else {
+    renderFinal();
+  }
+}
+
+// ---------- Bingo functions ----------
+function initBingoCard() {
+  const realCells = REVIEW_CARDS.map(c => ({ morpheme: c.morpheme, meaning: c.meaning, free: false }));
+  const withFree = [...realCells, { morpheme: null, meaning: "FREE", free: true }];
+  bingoCells = shuffle(withFree);
+  bingoMarked = bingoCells.map(c => c.free);
+  bingoCallQueue = shuffle(REVIEW_CARDS.map(c => c.morpheme));
+  bingoCalled = [];
+  bingoWon = false;
+  bingoWrongCount = 0;
+  bingoHintCellIndex = null;
+}
+
+function callNextMorpheme() {
+  if (bingoCallQueue.length === 0) return;
+  const next = bingoCallQueue.shift();
+  bingoCalled.push(next);
+  renderBingo();
+}
+
+function toggleBingoCell(i) {
+  if (bingoWon) return;
+  const cell = bingoCells[i];
+  if (cell.free) return;
+  if (bingoCalled.includes(cell.morpheme)) {
+    bingoMarked[i] = true;
+    bingoWrongCount = 0;
+    bingoHintCellIndex = null;
+    earnMoney(20);
+    renderBingo();
+    checkBingoWin();
+  } else {
+    bingoWrongCount++;
+    if (bingoWrongCount >= BINGO_HINT_AFTER_WRONG) {
+      const targetIdx = bingoCells.findIndex((c, ci) => !c.free && bingoCalled.includes(c.morpheme) && !bingoMarked[ci]);
+      if (targetIdx > -1) bingoHintCellIndex = targetIdx;
+    }
+    renderBingo();
+    const el = document.getElementById('bcell-' + i);
+    if (el) {
+      el.classList.add('shake');
+      setTimeout(() => el.classList.remove('shake'), 300);
+    }
+  }
+}
+
+function checkBingoWin() {
+  const size = 4;
+  const grid = (r, c) => bingoMarked[r * size + c];
+  for (let r = 0; r < size; r++) {
+    if ([0,1,2,3].every(c => grid(r, c))) return triggerBingoWin();
+  }
+  for (let c = 0; c < size; c++) {
+    if ([0,1,2,3].every(r => grid(r, c))) return triggerBingoWin();
+  }
+  if ([0,1,2,3].every(i => grid(i, i))) return triggerBingoWin();
+  if ([0,1,2,3].every(i => grid(i, 3 - i))) return triggerBingoWin();
+}
+
+function triggerBingoWin() {
+  bingoWon = true;
+  earnMoney(100);
+  renderBingo();
+}
+
+function renderBingo() {
+  const card = document.getElementById('card');
+  if (bingoWon) {
+    card.innerHTML = `
+      <div class="win-banner">
+        <div class="headline">🎉 BINGO!</div>
+        <p>You matched four morphemes in a row. Nice work knowing your meanings!</p>
+        <button class="call-btn" id="new-card-btn">New Card</button>
+      </div>
+    `;
+    document.getElementById('new-card-btn').onclick = () => { initBingoCard(); renderBingo(); };
+    return;
+  }
+
+  const calledChips = bingoCalled.map(m => `<span class="called-chip">${m}</span>`).join('');
+  const current = bingoCalled.length ? bingoCalled[bingoCalled.length - 1] : null;
+  const hintCell = bingoHintCellIndex !== null ? bingoCells[bingoHintCellIndex] : null;
+  const hintHtml = hintCell
+    ? `<div class="bingo-hint-text">Hint: \u201C${hintCell.morpheme}\u201D means \u201C${hintCell.meaning}\u201D \u2014 look for the highlighted square!</div>`
+    : '';
+
+  card.innerHTML = `
+    <div class="caller-box">
+      <div class="caller-current">${current ? current : "Ready?"}</div>
+      <div class="caller-sub">${current ? "Find its meaning on your card" : "Click Call to begin"}</div>
+    </div>
+    <button class="call-btn" id="call-btn" ${bingoCallQueue.length === 0 ? 'disabled' : ''}>
+      ${bingoCallQueue.length === 0 ? 'All Morphemes Called' : 'Call Next Morpheme \u2192'}
+    </button>
+    <div class="called-list">${calledChips}</div>
+    ${hintHtml}
+    <div class="bingo-grid" id="bingo-grid"></div>
+  `;
+  document.getElementById('call-btn').onclick = callNextMorpheme;
+
+  const grid = document.getElementById('bingo-grid');
+  bingoCells.forEach((cell, i) => {
+    const div = document.createElement('div');
+    div.id = 'bcell-' + i;
+    div.className = 'bingo-cell' + (cell.free ? ' free' : '') + (bingoMarked[i] ? ' marked' : '') + (i === bingoHintCellIndex ? ' hint' : '');
+    div.textContent = cell.meaning;
+    if (!cell.free) div.onclick = () => toggleBingoCell(i);
+    grid.appendChild(div);
+  });
+}
+
+// ---------- Morpheme Memory Match ----------
+let mmCards = [], mmFlipped = [], mmMatchedCount = 0, mmResolving = false, mmTotalPairs = 8;
+
+function startMorphMatch() {
+  appMode = "morphmatch";
+  document.getElementById('main-title').textContent = "🃏 Morpheme Memory Match";
+  document.getElementById('main-subtitle').textContent = "Flip two cards to find a matching pair";
+  document.getElementById('score-label').textContent = '';
+  document.getElementById('dots').innerHTML = '';
+  const chosen = shuffle(REVIEW_CARDS).slice(0, mmTotalPairs);
+  const morphCards = chosen.map(c => ({ morpheme: c.morpheme, type: 'morph', display: c.morpheme, matched: false }));
+  const meaningCards = chosen.map(c => ({ morpheme: c.morpheme, type: 'meaning', display: c.meaning, matched: false }));
+  mmCards = shuffle([...morphCards, ...meaningCards]);
+  mmFlipped = []; mmMatchedCount = 0; mmResolving = false;
+  renderMorphMatch();
+}
+
+function renderMorphMatch() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="match-status">Matched: ${mmMatchedCount} / ${mmTotalPairs}</div>
+    <div class="match-grid" id="morph-match-grid"></div>
+  `;
+  const grid = document.getElementById('morph-match-grid');
+  mmCards.forEach((c, i) => {
+    const div = document.createElement('div');
+    const isOpen = c.matched || mmFlipped.includes(i);
+    div.className = 'match-card' + (c.matched ? ' matched' : (mmFlipped.includes(i) ? ' flipped' : ''));
+    div.textContent = isOpen ? c.display : '?';
+    if (!c.matched && !mmResolving) div.onclick = () => flipMorphCard(i);
+    grid.appendChild(div);
+  });
+  if (mmMatchedCount === mmTotalPairs) {
+    setTimeout(renderMorphMatchWin, 500);
+  }
+}
+
+function flipMorphCard(i) {
+  if (mmResolving || mmFlipped.includes(i) || mmCards[i].matched) return;
+  mmFlipped.push(i);
+  renderMorphMatch();
+  if (mmFlipped.length === 2) {
+    mmResolving = true;
+    const [a, b] = mmFlipped;
+    const isMatch = mmCards[a].morpheme === mmCards[b].morpheme && mmCards[a].type !== mmCards[b].type;
+    setTimeout(() => {
+      if (isMatch) {
+        mmCards[a].matched = true; mmCards[b].matched = true;
+        mmMatchedCount++;
+        earnMoney(15);
+      }
+      mmFlipped = [];
+      mmResolving = false;
+      renderMorphMatch();
+    }, isMatch ? 500 : 900);
+  }
+}
+
+function renderMorphMatchWin() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="win-banner">
+      <div class="headline">🎉 All Matched!</div>
+      <p>You paired every morpheme with its meaning. Nice memory work!</p>
+      <button class="call-btn" id="mm-restart">Play Again</button>
+    </div>
+  `;
+  document.getElementById('mm-restart').onclick = startMorphMatch;
+}
+
+// ---------- Morpheme Speed Round ----------
+let msTimeLeft = 45, msCorrect = 0, msSeen = 0, msCurrent = null, msLocked = false;
+
+function startMorphSpeed() {
+  appMode = "morphspeed";
+  document.getElementById('main-title').textContent = "⚡ Morpheme Speed Round";
+  document.getElementById('main-subtitle').textContent = "Click the morpheme that matches the meaning";
+  if (msTimerId) clearInterval(msTimerId);
+  msTimeLeft = 45; msCorrect = 0; msSeen = 0;
+  updateMsScore();
+  renderMorphSpeedIntro();
+}
+
+function updateMsScore() {
+  document.getElementById('score-label').textContent = 'Correct: ' + msCorrect;
+}
+
+function renderMorphSpeedIntro() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="bonus-card">
+      <div class="case-label">Get Ready</div>
+      <p>You'll have 45 seconds. A meaning will appear \u2014 click the matching morpheme as fast as you can. Wrong guesses just shake it off, so keep going!</p>
+      <button class="next-btn" id="ms-start" style="align-self:center;">Start! \u2192</button>
+    </div>
+  `;
+  document.getElementById('ms-start').onclick = beginMorphSpeedTimer;
+}
+
+function beginMorphSpeedTimer() {
+  msTimerId = setInterval(() => {
+    msTimeLeft--;
+    const t = document.getElementById('ms-timer');
+    if (t) t.textContent = msTimeLeft + 's';
+    if (msTimeLeft <= 0) {
+      clearInterval(msTimerId);
+      msTimerId = null;
+      renderMorphSpeedResults();
+    }
+  }, 1000);
+  nextMorphSpeedQuestion();
+}
+
+function nextMorphSpeedQuestion() {
+  msLocked = false;
+  msCurrent = REVIEW_CARDS[Math.floor(Math.random() * REVIEW_CARDS.length)];
+  const distractors = shuffle(REVIEW_CARDS.filter(m => m.morpheme !== msCurrent.morpheme)).slice(0, 3).map(m => m.morpheme);
+  const options = shuffle([msCurrent.morpheme, ...distractors]);
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="timer-badge" id="ms-timer">${msTimeLeft}s</div>
+    <div class="quiz-sentence">${msCurrent.meaning}</div>
+    <div class="quiz-options" id="ms-options"></div>
+  `;
+  const wrap = document.getElementById('ms-options');
+  options.forEach(morph => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = morph;
+    btn.onclick = () => msAnswer(morph, btn);
+    wrap.appendChild(btn);
+  });
+}
+
+function msAnswer(morph, btnEl) {
+  if (msLocked || msTimeLeft <= 0) return;
+  msSeen++;
+  if (morph === msCurrent.morpheme) {
+    msLocked = true;
+    msCorrect++;
+    earnMoney(10);
+    updateMsScore();
+    btnEl.classList.add('correct');
+    setTimeout(() => { if (msTimeLeft > 0) nextMorphSpeedQuestion(); }, 250);
+  } else {
+    btnEl.classList.add('wrong');
+    setTimeout(() => btnEl.classList.remove('wrong'), 300);
+  }
+}
+
+function renderMorphSpeedResults() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="bonus-card">
+      <div class="case-label">Time's Up!</div>
+      <div class="final-score">${msCorrect}</div>
+      <p>correct out of ${msSeen} tries. Play again to beat your score!</p>
+      <button class="next-btn" id="ms-restart" style="align-self:center;">\u21ba Play Again</button>
+    </div>
+  `;
+  document.getElementById('ms-restart').onclick = startMorphSpeed;
+}
+
+// ================= VOCAB GAMES =================
+
+function startVocabMenu() {
+  appMode = "vocabmenu";
+  document.getElementById('main-title').textContent = "📘 Vocab Word Games";
+  document.getElementById('main-subtitle').textContent = "Pick a way to practice";
+  document.getElementById('menu-btn').hidden = false;
+  document.getElementById('dots').innerHTML = '';
+  document.getElementById('score-label').textContent = '';
+  renderVocabMenu();
+}
+
+function renderVocabMenu() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="mode-select">
+      <button class="mode-btn" id="pick-fillblank">
+        <div class="title">\u270f\ufe0f Fill in the Blank</div>
+        <div class="desc">Pick the vocab word that completes each sentence.</div>
+      </button>
+      <button class="mode-btn" id="pick-defmatch">
+        <div class="title">\ud83c\udccf Definition Match</div>
+        <div class="desc">Classic memory match \u2014 flip cards to pair each word with its definition.</div>
+      </button>
+      <button class="mode-btn" id="pick-speed">
+        <div class="title">\u26a1 Speed Round</div>
+        <div class="desc">A definition appears \u2014 click the matching word before time runs out!</div>
+      </button>
+      <button class="mode-btn" id="pick-twotruths">
+        <div class="title">\ud83c\udfad Two Truths and a Lie</div>
+        <div class="desc">Three statements about a word \u2014 spot the one that's false.</div>
+      </button>
+    </div>
+  `;
+  document.getElementById('pick-fillblank').onclick = startFillBlank;
+  document.getElementById('pick-defmatch').onclick = startDefMatch;
+  document.getElementById('pick-speed').onclick = startSpeedRound;
+  document.getElementById('pick-twotruths').onclick = startTwoTruths;
+}
+
+// ---------- 1. Fill in the Blank ----------
+let fbOrder = [], fbIdx = 0, fbScore = 0, fbLocked = false;
+
+function startFillBlank() {
+  appMode = "fillblank";
+  document.getElementById('main-title').textContent = "\u270f\ufe0f Fill in the Blank";
+  document.getElementById('main-subtitle').textContent = "Pick the word that completes the sentence";
+  fbOrder = shuffle(VOCAB); fbIdx = 0; fbScore = 0;
+  updateFbScore();
+  renderFillBlank();
+}
+
+function updateFbScore() {
+  document.getElementById('score-label').textContent = 'Score: ' + fbScore;
+}
+
+function renderFillBlank() {
+  if (fbIdx >= fbOrder.length) return renderFbResults();
+  fbLocked = false;
+  const q = fbOrder[fbIdx];
+  const distractors = shuffle(VOCAB.filter(v => v.word !== q.word)).slice(0, 3).map(v => v.word);
+  const options = shuffle([q.word, ...distractors]);
+  const card = document.getElementById('card');
+  const sentenceHtml = q.sentence.replace('___', '<span class="quiz-blank">______</span>');
+  card.innerHTML = `
+    <div class="quiz-progress">Question ${fbIdx + 1} of ${fbOrder.length}</div>
+    <div class="quiz-sentence">${sentenceHtml}</div>
+    <div class="quiz-options" id="fb-options"></div>
+    <div class="reveal" id="fb-reveal"></div>
+    <button class="next-btn" id="fb-next" disabled>Next \u2192</button>
+  `;
+  const optWrap = document.getElementById('fb-options');
+  options.forEach(word => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = word;
+    btn.onclick = () => fbAnswer(word, q, btn);
+    optWrap.appendChild(btn);
+  });
+  document.getElementById('fb-next').onclick = () => { fbIdx++; renderFillBlank(); };
+}
+
+function fbAnswer(chosen, q, btnEl) {
+  if (fbLocked) return;
+  fbLocked = true;
+  document.querySelectorAll('#fb-options .opt-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.word) b.classList.add('correct');
+    else if (b === btnEl) b.classList.add('wrong');
+  });
+  if (chosen === q.word) { fbScore += 10; earnMoney(10); }
+  updateFbScore();
+  document.getElementById('fb-reveal').classList.add('show');
+  document.getElementById('fb-reveal').innerHTML = `<div class="def">${q.word}</div><div class="trivia">${q.def}</div>`;
+  document.getElementById('fb-next').disabled = false;
+}
+
+function renderFbResults() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="bonus-card">
+      <div class="case-label">Results</div>
+      <div class="final-score">${fbScore} / ${fbOrder.length * 10}</div>
+      <p>Nice work! Play again for a fresh shuffle.</p>
+      <button class="next-btn" id="fb-restart" style="align-self:center;">\u21ba Play Again</button>
+    </div>
+  `;
+  document.getElementById('fb-restart').onclick = startFillBlank;
+}
+
+// ---------- 2. Definition Match (memory game) ----------
+let dmCards = [], dmFlipped = [], dmMatchedCount = 0, dmResolving = false;
+
+function startDefMatch() {
+  appMode = "defmatch";
+  document.getElementById('main-title').textContent = "\ud83c\udccf Definition Match";
+  document.getElementById('main-subtitle').textContent = "Flip two cards to find a matching pair";
+  document.getElementById('score-label').textContent = '';
+  const wordCards = VOCAB.map(v => ({ word: v.word, type: 'word', display: v.word, matched: false }));
+  const defCards = VOCAB.map(v => ({ word: v.word, type: 'def', display: v.def, matched: false }));
+  dmCards = shuffle([...wordCards, ...defCards]);
+  dmFlipped = []; dmMatchedCount = 0; dmResolving = false;
+  renderDefMatch();
+}
+
+function renderDefMatch() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="match-status">Matched: ${dmMatchedCount} / ${VOCAB.length}</div>
+    <div class="match-grid" id="match-grid"></div>
+  `;
+  const grid = document.getElementById('match-grid');
+  dmCards.forEach((c, i) => {
+    const div = document.createElement('div');
+    const isOpen = c.matched || dmFlipped.includes(i);
+    div.className = 'match-card' + (c.matched ? ' matched' : (dmFlipped.includes(i) ? ' flipped' : ''));
+    div.textContent = isOpen ? c.display : '?';
+    if (!c.matched && !dmResolving) div.onclick = () => flipMatchCard(i);
+    grid.appendChild(div);
+  });
+  if (dmMatchedCount === VOCAB.length) {
+    setTimeout(renderDefMatchWin, 500);
+  }
+}
+
+function flipMatchCard(i) {
+  if (dmResolving || dmFlipped.includes(i) || dmCards[i].matched) return;
+  dmFlipped.push(i);
+  renderDefMatch();
+  if (dmFlipped.length === 2) {
+    dmResolving = true;
+    const [a, b] = dmFlipped;
+    const isMatch = dmCards[a].word === dmCards[b].word && dmCards[a].type !== dmCards[b].type;
+    setTimeout(() => {
+      if (isMatch) {
+        dmCards[a].matched = true; dmCards[b].matched = true;
+        dmMatchedCount++;
+        earnMoney(15);
+      }
+      dmFlipped = [];
+      dmResolving = false;
+      renderDefMatch();
+    }, isMatch ? 500 : 900);
+  }
+}
+
+function renderDefMatchWin() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="win-banner">
+      <div class="headline">\ud83c\udf89 All Matched!</div>
+      <p>You paired every word with its definition. Nice memory work!</p>
+      <button class="call-btn" id="dm-restart">Play Again</button>
+    </div>
+  `;
+  document.getElementById('dm-restart').onclick = startDefMatch;
+}
+
+// ---------- 3. Speed Round ----------
+let spTimeLeft = 45, spCorrect = 0, spSeen = 0, spCurrent = null, spLocked = false;
+
+function startSpeedRound() {
+  appMode = "speedround";
+  document.getElementById('main-title').textContent = "\u26a1 Speed Round";
+  document.getElementById('main-subtitle').textContent = "Click the word that matches the definition";
+  if (speedTimerId) clearInterval(speedTimerId);
+  spTimeLeft = 45; spCorrect = 0; spSeen = 0;
+  updateSpScore();
+  renderSpeedIntro();
+}
+
+function updateSpScore() {
+  document.getElementById('score-label').textContent = 'Correct: ' + spCorrect;
+}
+
+function renderSpeedIntro() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="bonus-card">
+      <div class="case-label">Get Ready</div>
+      <p>You'll have 45 seconds. A definition will appear \u2014 click the matching word as fast as you can. Wrong guesses just shake it off, so keep going!</p>
+      <button class="next-btn" id="sp-start" style="align-self:center;">Start! \u2192</button>
+    </div>
+  `;
+  document.getElementById('sp-start').onclick = beginSpeedTimer;
+}
+
+function beginSpeedTimer() {
+  speedTimerId = setInterval(() => {
+    spTimeLeft--;
+    const t = document.getElementById('sp-timer');
+    if (t) t.textContent = spTimeLeft + 's';
+    if (spTimeLeft <= 0) {
+      clearInterval(speedTimerId);
+      speedTimerId = null;
+      renderSpeedResults();
+    }
+  }, 1000);
+  nextSpeedQuestion();
+}
+
+function nextSpeedQuestion() {
+  spLocked = false;
+  spCurrent = VOCAB[Math.floor(Math.random() * VOCAB.length)];
+  const distractors = shuffle(VOCAB.filter(v => v.word !== spCurrent.word)).slice(0, 3).map(v => v.word);
+  const options = shuffle([spCurrent.word, ...distractors]);
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="timer-badge" id="sp-timer">${spTimeLeft}s</div>
+    <div class="quiz-sentence">${spCurrent.def}</div>
+    <div class="quiz-options" id="sp-options"></div>
+  `;
+  const wrap = document.getElementById('sp-options');
+  options.forEach(word => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = word;
+    btn.onclick = () => spAnswer(word, btn);
+    wrap.appendChild(btn);
+  });
+}
+
+function spAnswer(word, btnEl) {
+  if (spLocked || spTimeLeft <= 0) return;
+  spSeen++;
+  if (word === spCurrent.word) {
+    spLocked = true;
+    spCorrect++;
+    earnMoney(10);
+    updateSpScore();
+    btnEl.classList.add('correct');
+    setTimeout(() => { if (spTimeLeft > 0) nextSpeedQuestion(); }, 250);
+  } else {
+    btnEl.classList.add('wrong');
+    setTimeout(() => btnEl.classList.remove('wrong'), 300);
+  }
+}
+
+function renderSpeedResults() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="bonus-card">
+      <div class="case-label">Time's Up!</div>
+      <div class="final-score">${spCorrect}</div>
+      <p>correct out of ${spSeen} tries. Play again to beat your score!</p>
+      <button class="next-btn" id="sp-restart" style="align-self:center;">\u21ba Play Again</button>
+    </div>
+  `;
+  document.getElementById('sp-restart').onclick = startSpeedRound;
+}
+
+// ---------- 4. Two Truths and a Lie ----------
+let ttOrder = [], ttIdx = 0, ttScore = 0, ttLocked = false;
+
+function startTwoTruths() {
+  appMode = "twotruths";
+  document.getElementById('main-title').textContent = "\ud83c\udfad Two Truths and a Lie";
+  document.getElementById('main-subtitle').textContent = "Spot the false statement for each word";
+  ttOrder = shuffle(TRUTH_LIE); ttIdx = 0; ttScore = 0;
+  updateTtScore();
+  renderTwoTruths();
+}
+
+function updateTtScore() {
+  document.getElementById('score-label').textContent = 'Score: ' + ttScore;
+}
+
+function renderTwoTruths() {
+  if (ttIdx >= ttOrder.length) return renderTtResults();
+  ttLocked = false;
+  const q = ttOrder[ttIdx];
+  const shuffledStatements = shuffle(q.statements);
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="quiz-progress">Word ${ttIdx + 1} of ${ttOrder.length}</div>
+    <div class="target-word">${q.word}</div>
+    <div class="quiz-options" id="tt-options"></div>
+    <div class="reveal" id="tt-reveal"></div>
+    <button class="next-btn" id="tt-next" disabled>Next \u2192</button>
+  `;
+  const wrap = document.getElementById('tt-options');
+  shuffledStatements.forEach(st => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = st.text;
+    btn.onclick = () => ttAnswer(st, shuffledStatements, q, btn);
+    wrap.appendChild(btn);
+  });
+  document.getElementById('tt-next').onclick = () => { ttIdx++; renderTwoTruths(); };
+}
+
+function ttAnswer(chosen, allStatements, q, btnEl) {
+  if (ttLocked) return;
+  ttLocked = true;
+  document.querySelectorAll('#tt-options .opt-btn').forEach((b, i) => {
+    b.disabled = true;
+    if (allStatements[i].isLie) b.classList.add('wrong');
+    else b.classList.add('correct');
+  });
+  if (chosen.isLie) { ttScore += 10; earnMoney(10); }
+  updateTtScore();
+  document.getElementById('tt-reveal').classList.add('show');
+  document.getElementById('tt-reveal').innerHTML = `<div class="def">${chosen.isLie ? "Correct \u2014 that's the lie!" : "Not quite \u2014 the red option was the lie."}</div><div class="trivia">${q.explanation}</div>`;
+  document.getElementById('tt-next').disabled = false;
+}
+
+function renderTtResults() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="bonus-card">
+      <div class="case-label">Results</div>
+      <div class="final-score">${ttScore} / ${ttOrder.length * 10}</div>
+      <p>Nice detective work spotting the lies!</p>
+      <button class="next-btn" id="tt-restart" style="align-self:center;">\u21ba Play Again</button>
+    </div>
+  `;
+  document.getElementById('tt-restart').onclick = startTwoTruths;
+}
+
+
+updateMoneyDisplay();
+goToStart();
+</script>
+</body>
+</html>
